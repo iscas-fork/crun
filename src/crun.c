@@ -213,7 +213,7 @@ enum
   OPTION_ROOTLESS
 };
 
-const char *argp_program_bug_address = "https://github.com/containers/crun/issues";
+const char *argp_program_bug_address = "https://github.com/iscas-fork/crun/issues";
 
 static struct argp_option options[] = { { "debug", OPTION_DEBUG, 0, 0, "produce verbose output", 0 },
                                         { "cgroup-manager", OPTION_CGROUP_MANAGER, "MANAGER", 0, "cgroup manager", 0 },
@@ -233,8 +233,10 @@ static void
 print_version (FILE *stream, struct argp_state *state arg_unused)
 {
   cleanup_free char *rundir = libcrun_get_state_directory (arguments.root, NULL);
-  fprintf (stream, "%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
-  fprintf (stream, "commit: %s\n", GIT_VERSION);
+//  fprintf (stream, "%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
+//  fprintf (stream, "commit: %s\n", GIT_VERSION);
+  fprintf (stream, "%s version %s\n", "iscas-crun", "1.14");
+  fprintf (stream, "commit: %s\n", "b8b26ff");
   fprintf (stream, "rundir: %s\n", rundir);
   fprintf (stream, "spec: 1.0.0\n");
 #ifdef HAVE_SYSTEMD
