@@ -2719,9 +2719,6 @@ libcrun_container_run (libcrun_context_t *context, libcrun_container_t *containe
   if (UNLIKELY (ret < 0))
     return ret;
 
-  if (def->oci_version && strstr (def->oci_version, "1.0") == NULL)
-    return crun_make_error (err, 0, "unknown version specified");
-
   if (def->process && def->process->terminal && detach && context->console_socket == NULL)
     return crun_make_error (err, 0, "use --console-socket with --detach when a terminal is used");
 
@@ -2822,9 +2819,6 @@ libcrun_container_create (libcrun_context_t *context, libcrun_container_t *conta
   context->detach = 1;
 
   container->context = context;
-
-  if (def->oci_version && strstr (def->oci_version, "1.0") == NULL)
-    return crun_make_error (err, 0, "unknown version specified");
 
   ret = check_config_file (def, context, err);
   if (UNLIKELY (ret < 0))
@@ -3913,7 +3907,7 @@ populate_capabilities (struct features_info_s *info, char ***capabilities, size_
 static void
 retrieve_mount_options (struct features_info_s **info)
 {
-  const struct propagation_flags_s *mount_options_list;
+  cleanup_free const struct propagation_flags_s *mount_options_list = NULL;
   size_t num_mount_options = 0;
 
   // Retrieve mount options from wordlist
@@ -3940,8 +3934,8 @@ libcrun_container_get_features (libcrun_context_t *context, struct features_info
   size_t num_actions = sizeof (actions) / sizeof (actions[0]);
   size_t num_hooks = sizeof (hooks) / sizeof (hooks[0]);
   size_t num_archs = sizeof (archs) / sizeof (archs[0]);
+  cleanup_free char **capabilities = NULL;
   size_t num_capabilities = 0;
-  char **capabilities = NULL;
 
   *info = xmalloc0 (sizeof (struct features_info_s));
 
@@ -4000,7 +3994,7 @@ libcrun_container_get_features (libcrun_context_t *context, struct features_info
     int size = snprintf (NULL, 0, "%u.%u.%u", version->major, version->minor, version->micro) + 1;
     char *version_string = xmalloc0 (size);
     snprintf (version_string, size, "%u.%u.%u", version->major, version->minor, version->micro);
-    (*info)->annotations.io_github_seccomp_libseccomp_version = xstrdup (version_string);
+    (*info)->annotations.io_github_seccomp_libseccomp_version = version_string;
   }
 #endif
 
@@ -4122,9 +4116,6 @@ libcrun_container_restore (libcrun_context_t *context, const char *id, libcrun_c
 
   container->context = context;
   def = container->container_def;
-
-  if (def->oci_version && strstr (def->oci_version, "1.0") == NULL)
-    return crun_make_error (err, 0, "unknown version specified");
 
   ret = check_config_file (def, context, err);
   if (UNLIKELY (ret < 0))
