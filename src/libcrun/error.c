@@ -163,7 +163,7 @@ get_timestamp (timestamp_t *timestamp, const char *suffix)
   gettimeofday (&tv, NULL);
   gmtime_r (&tv.tv_sec, &now);
   strftime ((char *) timestamp, 64, "%Y-%m-%dT%H:%M:%S", &now);
-  sprintf (((char *) timestamp) + 19, ".%06ldZ%.8s", tv.tv_usec, suffix);
+  sprintf (((char *) timestamp) + 19, ".%06lldZ%.8s", (long long int) tv.tv_usec, suffix);
 }
 
 static void *
@@ -423,7 +423,8 @@ libcrun_error (int errno_, const char *msg, ...)
   va_end (args_list);
 }
 
-void __attribute__ ((noreturn)) libcrun_fail_with_error (int errno_, const char *msg, ...)
+void __attribute__ ((noreturn))
+libcrun_fail_with_error (int errno_, const char *msg, ...)
 {
   va_list args_list;
   va_start (args_list, msg);
